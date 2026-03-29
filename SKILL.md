@@ -1,7 +1,13 @@
 ---
 name: typeset
-description: 全能编辑器排版 Skill — 将 Markdown 转换为多平台兼容的精美排版 HTML，支持微信公众号/知乎/掘金/博客/X Articles/Medium/LinkedIn
-version: 1.1.0
+description: 全能编辑器排版 Skill — 将 Markdown 转换为多平台兼容的精美排版 HTML，支持微信公众号/知乎/掘金/博客/X Articles/Medium/LinkedIn。适用于任何 AI Agent。
+version: 1.2.0
+compatible_agents:
+  - Claude Code
+  - Codex (OpenAI)
+  - Gemini CLI (Google)
+  - OpenCode
+  - Any agent supporting skill/prompt files
 triggers:
   - /typeset
   - 排版
@@ -19,7 +25,24 @@ triggers:
 
 # Typeset — 全能编辑器排版 Skill
 
-将 Markdown 转换为多平台兼容的精美排版 HTML。融合 mdnice、baoyu、wechat-format、md2wechat 等最佳实践。
+将 Markdown 转换为多平台兼容的精美排版 HTML。适用于任何 AI Agent（Claude Code、Codex、Gemini CLI、OpenCode 等）。融合 mdnice、baoyu、wechat-format、md2wechat 等最佳实践。
+
+## Agent 兼容性
+
+本 Skill 是纯 Markdown 指令集，不依赖任何特定 Agent 的专有 API。
+
+| Agent | 加载方式 |
+|-------|---------|
+| **Claude Code** | 放入 `~/.claude/skills/` 目录，自动注册为 `/typeset` |
+| **Codex (OpenAI)** | 放入项目根目录或通过 `AGENTS.md` 引用 SKILL.md |
+| **Gemini CLI** | 通过 `GEMINI.md` 引用或作为 context 文件加载 |
+| **OpenCode** | 放入 skill 目录或通过配置文件引用 |
+| **其他 Agent** | 将 SKILL.md 内容作为 system prompt 或 context 加载即可 |
+
+**依赖的通用能力**（所有主流 Agent 均具备）：
+- 读写文件（读取 Markdown 输入，写出 HTML 输出）
+- 运行 shell 命令（可选，用于 MarkItDown 格式转换）
+- 读取本 Skill 目录下的主题文件
 
 ## 调用格式
 

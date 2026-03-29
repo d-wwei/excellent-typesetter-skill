@@ -1,8 +1,8 @@
 # Excellent Typesetter
 
-A Claude Code skill that converts Markdown to publication-ready HTML for 7 platforms. One command, inline CSS, paste and publish.
+An AI agent skill that converts Markdown to publication-ready HTML for 7 platforms. Works with Claude Code, Codex, Gemini CLI, OpenCode, and any agent that can read prompt files. One command, inline CSS, paste and publish.
 
-一个 Claude Code Skill，把 Markdown 转成可直接发布的 HTML。7 个平台，内联 CSS，粘贴即发。
+一个通用 AI Agent Skill，把 Markdown 转成可直接发布的 HTML。兼容 Claude Code、Codex、Gemini CLI、OpenCode 等所有主流 Agent。7 个平台，内联 CSS，粘贴即发。
 
 ---
 
@@ -23,7 +23,7 @@ Then you need the same article on Medium. Different rules. LinkedIn? Different a
 ### Quick Start
 
 ```bash
-# In Claude Code, just say:
+# In any AI agent, just say:
 /typeset article.md --platform wechat --theme default
 
 # Or for Medium:
@@ -90,24 +90,33 @@ Compiled from [mdnice](https://github.com/mdnice/markdown-nice) (4.6k stars), [w
 ### Installation
 
 **Prerequisites:**
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) installed
+- Any AI agent (Claude Code, Codex, Gemini CLI, OpenCode, etc.)
 - Python 3.12+ with [MarkItDown](https://github.com/microsoft/markitdown) (optional, for non-Markdown input)
 
 ```bash
-# Clone to your Claude Code skills directory
-git clone https://github.com/d-wwei/excellent-typesetter-skill.git ~/.claude/skills/typeset
+# Clone the repo
+git clone https://github.com/d-wwei/excellent-typesetter.git
 
 # Optional: install MarkItDown for PDF/DOCX/PPTX support
 pipx install 'markitdown[all]' --python python3.12
 ```
 
-The skill auto-registers as `/typeset` in Claude Code.
+**Per-agent setup:**
+
+| Agent | Setup |
+|-------|-------|
+| Claude Code | `ln -s /path/to/excellent-typesetter ~/.claude/skills/typeset` — auto-registers as `/typeset` |
+| Codex | Copy `SKILL.md` to project root, or reference in `AGENTS.md` |
+| Gemini CLI | Reference `SKILL.md` in `GEMINI.md` |
+| OpenCode | Add to your skill directory or config |
+| Other | Load `SKILL.md` as system prompt or context file |
 
 ### File Structure
 
 ```
-~/.claude/skills/typeset/
+excellent-typesetter/
 ├── SKILL.md                  # Core: workflow, platform rules, rendering spec
+├── README.md                 # This file
 ├── remix-provenance.md       # Remix audit trail (7 source projects)
 └── themes/
     ├── default.md            # CSS values + HTML templates
@@ -151,7 +160,7 @@ MIT
 ### 快速开始
 
 ```bash
-# 在 Claude Code 中直接说：
+# 在任何 AI Agent 中直接说：
 /typeset 文章.md --platform wechat --theme default
 
 # 发 Medium：
@@ -218,18 +227,26 @@ MIT
 ### 安装
 
 **前置条件：**
-- 已安装 [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
+- 任何 AI Agent（Claude Code、Codex、Gemini CLI、OpenCode 等）
 - Python 3.12+ 和 [MarkItDown](https://github.com/microsoft/markitdown)（可选，用于非 Markdown 输入）
 
 ```bash
-# 克隆到 Claude Code skills 目录
-git clone https://github.com/d-wwei/excellent-typesetter-skill.git ~/.claude/skills/typeset
+# 克隆仓库
+git clone https://github.com/d-wwei/excellent-typesetter.git
 
 # 可选：安装 MarkItDown 支持 PDF/DOCX/PPTX
 pipx install 'markitdown[all]' --python python3.12
 ```
 
-Skill 会自动注册为 `/typeset` 命令。
+**各 Agent 配置方式：**
+
+| Agent | 配置 |
+|-------|------|
+| Claude Code | `ln -s /path/to/excellent-typesetter ~/.claude/skills/typeset` — 自动注册为 `/typeset` |
+| Codex | 将 `SKILL.md` 复制到项目根目录，或在 `AGENTS.md` 中引用 |
+| Gemini CLI | 在 `GEMINI.md` 中引用 `SKILL.md` |
+| OpenCode | 添加到 skill 目录或配置文件 |
+| 其他 Agent | 将 `SKILL.md` 作为 system prompt 或 context 文件加载 |
 
 ### 来源
 
