@@ -100,7 +100,7 @@ markitdown <input_file> -o <output.md>
 1. **提取 Frontmatter**: 解析 YAML frontmatter（`---` 分隔），提取 title、author、description、tags
 2. **CJK 空格规范化**: 在中文与英文/数字之间添加空格（盘古之白）
 3. **标题清理**: 如果目标平台是微信，从正文中移除 H1 标题（微信用 title 字段单独展示）
-4. **链接预处理**: 收集所有外部链接，准备脚注化（针对微信/知乎）
+4. **链接预处理**: 收集所有外部链接。微信平台下移除所有非微信域名的 `<a>` 标签，转为纯文本脚注（上标编号 + 文末 URL 文字）。其他平台保留超链接
 
 ### Step 3: 可选 — 人性化处理
 
@@ -175,7 +175,7 @@ markitdown <input_file> -o <output.md>
 2. **禁止纯黑色 #000000** — 微信编辑器会吞掉纯黑的 `color` 属性。使用 `rgb(1,1,1)` 或 `#3f3f3f` 代替
 3. **列表项包裹 `<section>`** — 微信会重置 `<ul>/<ol>` 子元素样式。每个 `<li>` 内容必须包在 `<section>` 中：`<li><section style="...">内容</section></li>`
 4. **禁止 `<pre>` 标签** — 微信对 `<pre>` 渲染异常。代码块改用 `<section>` 容器 + 逐行 `<span>` 标记
-5. **外部链接转脚注** — 微信文章中外部链接不可点击。将链接转为上标 `[n]` 引用，文末附参考文献列表
+5. **禁止非微信域名超链接** — 微信编辑器不接收非 `weixin.qq.com` 域名的 `<a href>` 标签。所有外部链接必须转为纯文本展示（上标编号 `[n]` + 文末参考文献区列出 URL 文字），**不使用任何 `<a>` 标签包裹外部 URL**。仅微信域内链接可保留 `<a>` 标签
 6. **表格需滚动容器** — 用 `<section style="overflow-x: auto; -webkit-overflow-scrolling: touch;">` 包裹 `<table>`
 7. **亚像素边框用 transform** — 微信不支持小数边框宽度，用 `transform: scale(0.5)` 实现 0.5px 线
 8. **标题装饰用 span 三段式** — 每个标题内注入 `<span class="prefix">` + `<span class="content">` + `<span class="suffix">`，通过内联样式实现装饰效果（编号、下划线、图标），无需自定义 Markdown 语法
@@ -430,27 +430,35 @@ markitdown <input_file> -o <output.md>
 
 ### 链接
 
-**微信/知乎平台 — 脚注化**（来源: mdnice + wechat-format）：
+#### 微信公众号 — 纯文本脚注（无超链接）
 
-渲染时将外部链接转为脚注引用：
+**核心规则**: 微信编辑器不接收非 `weixin.qq.com` 域名的超链接。**所有外部 URL 不得使用 `<a>` 标签**，必须以纯文本形式展示。
+
+渲染方式：正文中用上标编号标记，文末参考文献区以纯文本列出 URL。
 
 ```html
-<!-- 正文中 -->
-<span style="color: {theme.text.color};">链接文字</span><sup style="font-size: 0.7em; color: {theme.footnote.color}; vertical-align: super;"><a href="#fn-1" style="color: {theme.footnote.color}; text-decoration: none;">[1]</a></sup>
+<!-- 正文中：纯文本 + 上标编号（无 <a> 标签） -->
+<span style="color: {theme.text.color};">链接文字</span><sup style="font-size: 0.7em; color: {theme.footnote.color}; vertical-align: super;">[1]</sup>
 
-<!-- 文末参考文献区 -->
+<!-- 文末参考文献区：URL 为纯文本（无 <a> 标签） -->
 <section style="margin-top: 40px; padding-top: 16px; border-top: 1px solid {theme.hr.color};">
   <p style="font-size: 14px; font-weight: bold; color: {theme.text.secondary-color}; margin-bottom: 8px;">参考文献</p>
-  <p id="fn-1" style="font-size: 13px; color: {theme.text.secondary-color}; margin: 4px 0; word-break: break-all;">
-    [1] 链接文字: <em style="font-style: italic;">https://example.com/url</em>
+  <p style="font-size: 13px; color: {theme.text.secondary-color}; margin: 4px 0; word-break: break-all;">
+    [1] 链接文字: https://example.com/url
   </p>
 </section>
 ```
 
 **规则**:
-- 微信域内链接（`mp.weixin.qq.com`）保留为可点击 `<a>` 标签
-- href 等于文字的链接直接显示为纯文本
-- 博客平台保留所有链接为正常 `<a>` 标签
+- 微信域内链接（`mp.weixin.qq.com`、`weixin.qq.com`）是唯一例外，可保留 `<a>` 标签
+- 所有其他域名的 URL：**禁止 `<a>` 标签**，以纯文本展示
+- href 等于文字的链接直接显示为纯文本 URL
+- 上标编号 `[n]` 也用纯文本 `<sup>` 而非 `<a>` 标签
+
+#### 其他平台
+
+- **知乎/掘金/Medium/LinkedIn/X**: 链接保留为正常 `<a>` 标签
+- **博客**: 保留所有链接为正常 `<a>` 标签
 
 ### Callout / 提示框
 
@@ -521,7 +529,21 @@ markitdown <input_file> -o <output.md>
 [^1]: 脚注内容
 ```
 
-渲染为双向链接（来源: baoyu）：
+**微信平台**渲染为纯文本脚注（无 `<a>` 标签）：
+
+```html
+<!-- 正文引用 -->
+<sup style="font-size: 0.7em; color: {theme.footnote.color};">[1]</sup>
+
+<!-- 文末定义 -->
+<section style="margin-top: 40px; padding-top: 16px; border-top: 1px solid {theme.hr.color};">
+  <p style="font-size: 13px; color: {theme.text.secondary-color}; margin: 4px 0;">
+    [1] 脚注内容
+  </p>
+</section>
+```
+
+**博客/其他平台**渲染为双向链接（来源: baoyu）：
 
 ```html
 <!-- 正文引用 -->
@@ -735,7 +757,7 @@ Claude 在生成代码块时按以下规则识别 token 类型：
 4. **代码块限制宽度** — 超长代码行会导致横向滚动，建议 80 字符换行
 5. **图片在微信中会独占一行** — 行内图文混排在微信中不可靠
 6. **人性化处理建议在排版前执行** — 修改文本后再渲染样式
-7. **脚注和链接引用** — 微信平台下外部链接自动转脚注，无需手动处理
+7. **微信链接处理** — 微信平台下所有非微信域名的 URL 禁止使用 `<a>` 标签，自动转为纯文本脚注（上标编号 + 文末 URL 文字）
 
 ---
 
